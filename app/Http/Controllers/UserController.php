@@ -9,6 +9,7 @@ use App\Models\post;
 use App\Models\user_post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use App\Http\Resources\UsersResource;
 
 class UserController extends Controller
 {
@@ -19,8 +20,14 @@ class UserController extends Controller
      */
     public function index()
     {
-        $datas=user_post::get();
-        return view(('user.index'), compact('datas'));
+        //$datas=user_post::get();
+        //dd($datas);
+       //return view(('user.index'), compact('datas'));
+
+       return UsersResource::collection(user_post::get());
+       //return User::collection(Profile::all());
+
+
     }
 
     /**
@@ -56,8 +63,11 @@ class UserController extends Controller
         }
         $data->bio= $request->input('bio');    
         $data->save();
+       $data->message="data insertion successful";
+        return new UsersResource($data);
 
-        return redirect()->route('user.index')->with('success', 'User Added.');
+       // return redirect()->route('user.index')->with('success', 'User Added.');
+        
     }
 
     /**
@@ -68,7 +78,9 @@ class UserController extends Controller
      */
     public function show(user_post $user)
     {
-        //
+       $user->message="data fetch successful";
+        return new UsersResource($user);
+        //return $user;
     }
 
     /**
@@ -111,8 +123,9 @@ class UserController extends Controller
         $user->bio= $request->input('bio');
     
         $user->update();
+        return new UsersResource($user);
 
-        return redirect()->route('user.index')->with('success', 'User Updated.');
+        //return redirect()->route('user.index')->with('success', 'User Updated.');
     }
 
     /**
@@ -125,7 +138,8 @@ class UserController extends Controller
     {
         $user->delete();
         unlink('images/user/'.$user->image);
+        return new UsersResource($user);
 
-        return redirect()->route('user.index')->with('error', 'User Deleted successfully.');
+        //return redirect()->route('user.index')->with('error', 'User Deleted successfully.');
     }
 }
